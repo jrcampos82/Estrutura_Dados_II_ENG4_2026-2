@@ -1,12 +1,19 @@
+# ============================================================================
+#  A pasta professor/ contem a RESOLUCAO dos exercicios.
+#  Ela nunca deve ir para este repositorio, que e publico.
+# ============================================================================
+professor/
+
 # Arquivos gerados pela compilacao
 *.o
 *.exe
 *.dSYM/
 a.out
 
-# Executaveis
-avl_aluno
-avl
+# Executaveis (caminhos especificos, para nao ignorar por engano uma
+# futura pasta chamada "avl")
+/aluno/avl_aluno
+/professor/avl
 
 # Sistema / editores
 .DS_Store
