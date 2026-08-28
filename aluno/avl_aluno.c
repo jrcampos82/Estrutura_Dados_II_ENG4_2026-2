@@ -48,7 +48,8 @@
 
 int maximo(int a, int b)
 {
-    return (a > b) ? a : b;
+    // implementar aqui
+    return 0;
 }
 
 int altura(No *no)
@@ -65,23 +66,14 @@ void atualizarAltura(No *no)
 
 int fator(No *no)
 {
-    if (no == NULL)
-        return 0;
-    return altura(no->esq) - altura(no->dir);
+    // calcular a altura
+    return 0;
 }
 
 No *criarNo(int chave)
 {
-    No *no = (No *) malloc(sizeof(No));
-    if (no == NULL) {
-        printf("Erro: memoria insuficiente.\n");
-        exit(1);
-    }
-    no->chave  = chave;
-    no->altura = 0;               /* nasce como folha */
-    no->esq    = NULL;
-    no->dir    = NULL;
-    return no;
+    // critar NO
+    return NULL;
 }
 
 /* Decide qual rotacao aplicar quando um no fica desequilibrado.
