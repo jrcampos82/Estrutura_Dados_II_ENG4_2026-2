@@ -1,0 +1,14 @@
+# Arquivos gerados pela compilacao
+*.o
+*.exe
+*.dSYM/
+a.out
+
+# Executaveis
+avl_aluno
+avl
+
+# Sistema / editores
+.DS_Store
+.vscode/
+.idea/
