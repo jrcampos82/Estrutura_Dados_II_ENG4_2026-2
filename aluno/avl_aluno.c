@@ -41,6 +41,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* ============================================================================
  *  FUNCOES JA PRONTAS - nao precisa mexer
@@ -48,8 +49,7 @@
 
 int maximo(int a, int b)
 {
-    // implementar aqui
-    return 0;
+    return (a > b) ? a : b;
 }
 
 int altura(No *no)
@@ -66,14 +66,24 @@ void atualizarAltura(No *no)
 
 int fator(No *no)
 {
-    // calcular a altura
-    return 0;
+    if (no == NULL)
+      return 0;
+    return altura(no->esq) - altura(no->dir);
 }
 
 No *criarNo(int chave)
 {
-    // critar NO
-    return NULL;
+    No *no = (No *) malloc(sizeof(No));
+    if (no == NULL){
+      printf("Err: mem insuficiente!\n");
+      exit(1);
+    }
+    // iniciar o no
+    no->chave = chave;
+    no->altura = 0;
+    no->esq = NULL;
+    no->dir = NULL;
+    return no;
 }
 
 /* Decide qual rotacao aplicar quando um no fica desequilibrado.
@@ -137,19 +147,63 @@ int contarNos(No *raiz)
     return 1 + contarNos(raiz->esq) + contarNos(raiz->dir);
 }
 
+/* Funcao auxiliar recursiva para desenhar a arvore com linhas de conexao (ramos).
+ * Desenha a arvore deitada: filho direito acima (┌──), filho esquerdo abaixo (└──). */
+static void imprimirArvoreRec(No *raiz, char *prefixo, int eEsquerdo, int eRaiz)
+{
+    if (raiz == NULL)
+        return;
+
+    char novoPrefixo[512];
+
+    /* 1. Subarvore direita (aparece acima no terminal) */
+    if (raiz->dir != NULL) {
+        if (eRaiz) {
+            snprintf(novoPrefixo, sizeof(novoPrefixo), "%s    ", prefixo);
+        } else if (eEsquerdo) {
+            snprintf(novoPrefixo, sizeof(novoPrefixo), "%s│   ", prefixo);
+        } else {
+            snprintf(novoPrefixo, sizeof(novoPrefixo), "%s    ", prefixo);
+        }
+        imprimirArvoreRec(raiz->dir, novoPrefixo, 0, 0);
+    }
+
+    /* 2. No atual */
+    printf("%s", prefixo);
+    if (!eRaiz) {
+        if (eEsquerdo) {
+            printf("└── ");
+        } else {
+            printf("┌── ");
+        }
+    }
+    printf("%d (h=%d, fb=%d)\n", raiz->chave, raiz->altura, fator(raiz));
+
+    /* 3. Subarvore esquerda (aparece abaixo no terminal) */
+    if (raiz->esq != NULL) {
+        if (eRaiz) {
+            snprintf(novoPrefixo, sizeof(novoPrefixo), "%s    ", prefixo);
+        } else if (eEsquerdo) {
+            snprintf(novoPrefixo, sizeof(novoPrefixo), "%s    ", prefixo);
+        } else {
+            snprintf(novoPrefixo, sizeof(novoPrefixo), "%s│   ", prefixo);
+        }
+        imprimirArvoreRec(raiz->esq, novoPrefixo, 1, 0);
+    }
+}
+
 void imprimirArvore(No *raiz, int nivel)
 {
     if (raiz == NULL)
         return;
 
-    imprimirArvore(raiz->dir, nivel + 1);        /* direita em cima */
-
+    char prefixoInicial[512] = "";
     int i;
-    for (i = 0; i < nivel; i++)
-        printf("        ");
-    printf("%d (h=%d, fb=%d)\n", raiz->chave, raiz->altura, fator(raiz));
+    for (i = 0; i < nivel && i < 50; i++) {
+        strcat(prefixoInicial, "    ");
+    }
 
-    imprimirArvore(raiz->esq, nivel + 1);        /* esquerda embaixo */
+    imprimirArvoreRec(raiz, prefixoInicial, 0, 1);
 }
 
 void emOrdem(No *raiz)
@@ -229,9 +283,10 @@ int arvoreValida(No *raiz)
  * ========================================================================== */
 void liberar(No *raiz)
 {
-    (void) raiz;    /* apague esta linha quando implementar */
-
-    /* escreva sua implementacao aqui */
+    if (raiz == NULL) return;
+    liberar(raiz->esq);
+    liberar(raiz->dir);
+    free(raiz);
 }
 
 /* ============================================================================
@@ -261,9 +316,19 @@ void liberar(No *raiz)
  * ========================================================================== */
 No *rotacaoDireita(No *y)
 {
-    /* escreva sua implementacao aqui */
+    No *x = y->esq;
+    No *B = x->dir;
 
-    return y;       /* provisorio, para o programa compilar: troque pelo certo */
+    // rotacao
+    x->dir = y;
+    y->esq = B;
+
+    // atualizar
+    atualizarAltura(y);
+    atualizarAltura(x);
+
+
+    return x;
 }
 
 /* ============================================================================
@@ -289,9 +354,19 @@ No *rotacaoDireita(No *y)
  * ========================================================================== */
 No *rotacaoEsquerda(No *x)
 {
-    /* escreva sua implementacao aqui */
+    No *y = x->dir;
+    No *B = y->esq;
 
-    return x;       /* provisorio, para o programa compilar: troque pelo certo */
+    // rotacao
+    y->esq = x;
+    x->dir = B;
+
+    // atualizar
+    atualizarAltura(x);
+    atualizarAltura(y);
+
+
+    return y;        /* provisorio, para o programa compilar: troque pelo certo */
 }
 
 /* ============================================================================
@@ -315,11 +390,17 @@ No *rotacaoEsquerda(No *x)
  * ========================================================================== */
 No *inserir(No *raiz, int chave)
 {
-    (void) chave;   /* apague esta linha quando implementar */
+    if(raiz == NULL)
+    return criarNo(chave);
 
-    /* escreva sua implementacao aqui */
+  if (chave < raiz->chave)
+    raiz->esq = inserir(raiz->esq, chave);
+  else if (chave > raiz->chave)
+    raiz->dir = inserir(raiz->dir, chave);
+  else
+    return raiz;
 
-    return raiz;    /* provisorio, para o programa compilar */
+  return rebalancear(raiz);
 }
 
 /* ============================================================================

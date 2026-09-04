@@ -1,4 +1,6 @@
 /* ============================================================================
+ * https://github.com/jrcampos82/Estrutura_Dados_II_ENG4_2026-2
+ *
  *  main_aluno.c - programa de teste da ATIVIDADE
  *  Estrutura de Dados 2 - IFMS
  *
