@@ -23,6 +23,8 @@ ifeq (run,$(firstword $(MAKECMDGOALS)))
   $(eval $(RUN_ARGS):;@:)
 endif
 
+
+
 $(PROG): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(PROG)
 
@@ -39,7 +41,7 @@ avl_aluno.o: avl_aluno.c avl_aluno.h
 	$(CC) $(CFLAGS) -c avl_aluno.c
 
 run: $(PROG)
-	./$(PROG)
+	./$(PROG) $(RUN_ARGS)
 
 clean:
 	rm -f $(PROG) $(OBJS)
