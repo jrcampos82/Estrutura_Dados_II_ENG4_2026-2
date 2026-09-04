@@ -17,6 +17,15 @@ CFLAGS = -Wall -Wextra -g
 PROG   = avl_aluno
 OBJS   = main_aluno.o avl_aluno.o
 
+# Suporte a argumentos para 'make run' (ex: make run 15)
+ifeq (run,$(firstword $(MAKECMDGOALS)))
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(RUN_ARGS):;@:)
+endif
+
+$(PROG): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(PROG)
+
 # Alvo principal: liga os dois .o e gera o executavel
 $(PROG): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(PROG)

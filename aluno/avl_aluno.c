@@ -43,6 +43,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct {
+  char tipo[40];
+  int chaveNo;
+} InfoRotacao;
+
+#define MAX_ROT_OP 64
+
+static InfoRotacao rotacoesOperacao[MAX_ROT_OP];
+static int qtdRotacoesOperacao = 0;
+
+static int totalRotacoesEE = 0;
+static int totalRotacoesDD = 0;
+static int totalRotacoesED = 0;
+static int totalRotacoesDE = 0;
+
 /* ============================================================================
  *  FUNCOES JA PRONTAS - nao precisa mexer
  * ========================================================================== */
@@ -134,6 +149,16 @@ int contarNos(No *raiz) {
   if (raiz == NULL)
     return 0;
   return 1 + contarNos(raiz->esq) + contarNos(raiz->dir);
+}
+
+void exibirEstatisticasRotacoes(void) {
+  printf("\n=== Estatisticas Acumuladas de Rotacoes ===\n");
+  printf("  Simples a Direita (EE) : %d\n", totalRotacoesEE);
+  printf("  Simples a Esquerda (DD): %d\n", totalRotacoesDD);
+  printf("  Dupla a Direita (ED)   : %d\n", totalRotacoesED);
+  printf("  Dupla a Esquerda (DE)  : %d\n", totalRotacoesDE);
+  // printf("  Total de rotacoes      : %d\n", obterTotalRotacoes());
+  printf("===========================================\n");
 }
 
 /* Funcao auxiliar recursiva para desenhar a arvore com linhas de conexao

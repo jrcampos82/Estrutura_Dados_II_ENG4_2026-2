@@ -130,3 +130,9 @@ void preOrdem(No *raiz);
 int arvoreValida(No *raiz);
 
 #endif /* AVL_ALUNO_H */
+
+/* Estatisticas */
+static void registrarRotacao(const char *tipo, int chaveNo);
+
+// print est.
+void exibirEstatisticasRotacoes(void);
