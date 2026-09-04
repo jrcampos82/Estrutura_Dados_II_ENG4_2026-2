@@ -47,43 +47,36 @@
  *  FUNCOES JA PRONTAS - nao precisa mexer
  * ========================================================================== */
 
-int maximo(int a, int b)
-{
-    return (a > b) ? a : b;
+int maximo(int a, int b) { return (a > b) ? a : b; }
+
+int altura(No *no) {
+  if (no == NULL)
+    return -1; /* arvore vazia tem altura -1 */
+  return no->altura;
 }
 
-int altura(No *no)
-{
-    if (no == NULL)
-        return -1;                /* arvore vazia tem altura -1 */
-    return no->altura;
+void atualizarAltura(No *no) {
+  no->altura = 1 + maximo(altura(no->esq), altura(no->dir));
 }
 
-void atualizarAltura(No *no)
-{
-    no->altura = 1 + maximo(altura(no->esq), altura(no->dir));
+int fator(No *no) {
+  if (no == NULL)
+    return 0;
+  return altura(no->esq) - altura(no->dir);
 }
 
-int fator(No *no)
-{
-    if (no == NULL)
-      return 0;
-    return altura(no->esq) - altura(no->dir);
-}
-
-No *criarNo(int chave)
-{
-    No *no = (No *) malloc(sizeof(No));
-    if (no == NULL){
-      printf("Err: mem insuficiente!\n");
-      exit(1);
-    }
-    // iniciar o no
-    no->chave = chave;
-    no->altura = 0;
-    no->esq = NULL;
-    no->dir = NULL;
-    return no;
+No *criarNo(int chave) {
+  No *no = (No *)malloc(sizeof(No));
+  if (no == NULL) {
+    printf("Err: mem insuficiente!\n");
+    exit(1);
+  }
+  // iniciar o no
+  no->chave = chave;
+  no->altura = 0;
+  no->esq = NULL;
+  no->dir = NULL;
+  return no;
 }
 
 /* Decide qual rotacao aplicar quando um no fica desequilibrado.
@@ -99,162 +92,165 @@ No *criarNo(int chave)
  * voce escrever as duas (TODO 2 e TODO 3).
  *
  * DESAFIO EXTRA: apague o corpo desta funcao e reescreva sozinho. */
-No *rebalancear(No *no)
-{
-    atualizarAltura(no);
+No *rebalancear(No *no) {
+  atualizarAltura(no);
 
-    int fb = fator(no);
+  int fb = fator(no);
 
-    if (fb > 1) {                                /* pesado a esquerda */
-        if (fator(no->esq) < 0)                  /* caso ED */
-            no->esq = rotacaoEsquerda(no->esq);
-        return rotacaoDireita(no);               /* casos EE e ED */
-    }
+  if (fb > 1) {             /* pesado a esquerda */
+    if (fator(no->esq) < 0) /* caso ED */
+      no->esq = rotacaoEsquerda(no->esq);
+    return rotacaoDireita(no); /* casos EE e ED */
+  }
 
-    if (fb < -1) {                               /* pesado a direita */
-        if (fator(no->dir) > 0)                  /* caso DE */
-            no->dir = rotacaoDireita(no->dir);
-        return rotacaoEsquerda(no);              /* casos DD e DE */
-    }
+  if (fb < -1) {            /* pesado a direita */
+    if (fator(no->dir) > 0) /* caso DE */
+      no->dir = rotacaoDireita(no->dir);
+    return rotacaoEsquerda(no); /* casos DD e DE */
+  }
 
-    return no;                                   /* ja estava equilibrado */
+  return no; /* ja estava equilibrado */
 }
 
-No *menorNo(No *no)
-{
-    while (no != NULL && no->esq != NULL)
-        no = no->esq;
-    return no;
+No *menorNo(No *no) {
+  while (no != NULL && no->esq != NULL)
+    no = no->esq;
+  return no;
 }
 
-No *buscar(No *raiz, int chave)
-{
-    while (raiz != NULL) {
-        if (chave == raiz->chave)
-            return raiz;
-        if (chave < raiz->chave)
-            raiz = raiz->esq;
-        else
-            raiz = raiz->dir;
-    }
-    return NULL;
+No *buscar(No *raiz, int chave) {
+  while (raiz != NULL) {
+    if (chave == raiz->chave)
+      return raiz;
+    if (chave < raiz->chave)
+      raiz = raiz->esq;
+    else
+      raiz = raiz->dir;
+  }
+  return NULL;
 }
 
-int contarNos(No *raiz)
-{
-    if (raiz == NULL)
-        return 0;
-    return 1 + contarNos(raiz->esq) + contarNos(raiz->dir);
+int contarNos(No *raiz) {
+  if (raiz == NULL)
+    return 0;
+  return 1 + contarNos(raiz->esq) + contarNos(raiz->dir);
 }
 
-/* Funcao auxiliar recursiva para desenhar a arvore com linhas de conexao (ramos).
- * Desenha a arvore deitada: filho direito acima (┌──), filho esquerdo abaixo (└──). */
-static void imprimirArvoreRec(No *raiz, char *prefixo, int eEsquerdo, int eRaiz)
-{
-    if (raiz == NULL)
-        return;
+/* Funcao auxiliar recursiva para desenhar a arvore com linhas de conexao
+ * (ramos). Desenha a arvore deitada: filho direito acima (┌──), filho esquerdo
+ * abaixo (└──). */
+static void imprimirArvoreRec(No *raiz, char *prefixo, int eEsquerdo,
+                              int eRaiz) {
+  if (raiz == NULL)
+    return;
 
-    char novoPrefixo[512];
+  char novoPrefixo[512];
 
-    /* 1. Subarvore direita (aparece acima no terminal) */
-    if (raiz->dir != NULL) {
-        if (eRaiz) {
-            snprintf(novoPrefixo, sizeof(novoPrefixo), "%s    ", prefixo);
-        } else if (eEsquerdo) {
-            snprintf(novoPrefixo, sizeof(novoPrefixo), "%s│   ", prefixo);
-        } else {
-            snprintf(novoPrefixo, sizeof(novoPrefixo), "%s    ", prefixo);
-        }
-        imprimirArvoreRec(raiz->dir, novoPrefixo, 0, 0);
+  /* 1. Subarvore direita (aparece acima no terminal) */
+  if (raiz->dir != NULL) {
+    if (eRaiz) {
+      snprintf(novoPrefixo, sizeof(novoPrefixo), "%s    ", prefixo);
+    } else if (eEsquerdo) {
+      snprintf(novoPrefixo, sizeof(novoPrefixo), "%s│   ", prefixo);
+    } else {
+      snprintf(novoPrefixo, sizeof(novoPrefixo), "%s    ", prefixo);
     }
+    imprimirArvoreRec(raiz->dir, novoPrefixo, 0, 0);
 
-    /* 2. No atual */
-    printf("%s", prefixo);
-    if (!eRaiz) {
-        if (eEsquerdo) {
-            printf("└── ");
-        } else {
-            printf("┌── ");
-        }
+    /* Linha conectora vertical para o filho direito (espacamento) */
+    printf("%s│\n", novoPrefixo);
+  }
+
+  /* 2. No atual */
+  printf("%s", prefixo);
+  if (!eRaiz) {
+    if (eEsquerdo) {
+      printf("└── ");
+    } else {
+      printf("┌── ");
     }
-    printf("%d (h=%d, fb=%d)\n", raiz->chave, raiz->altura, fator(raiz));
+  }
+  printf("%d (h=%d, fb=%d)\n", raiz->chave, raiz->altura, fator(raiz));
 
-    /* 3. Subarvore esquerda (aparece abaixo no terminal) */
-    if (raiz->esq != NULL) {
-        if (eRaiz) {
-            snprintf(novoPrefixo, sizeof(novoPrefixo), "%s    ", prefixo);
-        } else if (eEsquerdo) {
-            snprintf(novoPrefixo, sizeof(novoPrefixo), "%s    ", prefixo);
-        } else {
-            snprintf(novoPrefixo, sizeof(novoPrefixo), "%s│   ", prefixo);
-        }
-        imprimirArvoreRec(raiz->esq, novoPrefixo, 1, 0);
-    }
-}
-
-void imprimirArvore(No *raiz, int nivel)
-{
-    if (raiz == NULL)
-        return;
-
-    char prefixoInicial[512] = "";
-    int i;
-    for (i = 0; i < nivel && i < 50; i++) {
-        strcat(prefixoInicial, "    ");
+  /* 3. Subarvore esquerda (aparece abaixo no terminal) */
+  if (raiz->esq != NULL) {
+    if (eRaiz) {
+      snprintf(novoPrefixo, sizeof(novoPrefixo), "%s    ", prefixo);
+    } else if (eEsquerdo) {
+      snprintf(novoPrefixo, sizeof(novoPrefixo), "%s    ", prefixo);
+    } else {
+      snprintf(novoPrefixo, sizeof(novoPrefixo), "%s│   ", prefixo);
     }
 
-    imprimirArvoreRec(raiz, prefixoInicial, 0, 1);
+    /* Linha conectora vertical para o filho esquerdo (espacamento) */
+    printf("%s│\n", novoPrefixo);
+
+    imprimirArvoreRec(raiz->esq, novoPrefixo, 1, 0);
+  }
 }
 
-void emOrdem(No *raiz)
-{
-    if (raiz == NULL)
-        return;
-    emOrdem(raiz->esq);
-    printf("%d ", raiz->chave);
-    emOrdem(raiz->dir);
+void imprimirArvore(No *raiz, int nivel) {
+  if (raiz == NULL)
+    return;
+
+  char prefixoInicial[512] = "";
+  int i;
+  for (i = 0; i < nivel && i < 50; i++) {
+    strcat(prefixoInicial, "    ");
+  }
+
+  imprimirArvoreRec(raiz, prefixoInicial, 0, 1);
 }
 
-void preOrdem(No *raiz)
-{
-    if (raiz == NULL)
-        return;
-    printf("%d ", raiz->chave);
-    preOrdem(raiz->esq);
-    preOrdem(raiz->dir);
+void emOrdem(No *raiz) {
+  if (raiz == NULL)
+    return;
+  emOrdem(raiz->esq);
+  printf("%d ", raiz->chave);
+  emOrdem(raiz->dir);
+}
+
+void preOrdem(No *raiz) {
+  if (raiz == NULL)
+    return;
+  printf("%d ", raiz->chave);
+  preOrdem(raiz->esq);
+  preOrdem(raiz->dir);
 }
 
 /* Confere as tres regras de uma AVL de uma vez so. Devolve a altura da
  * subarvore, ou -2 para avisar que encontrou um problema. */
-static int validarRec(No *no, int temMin, int min, int temMax, int max)
-{
-    if (no == NULL)
-        return -1;
+static int validarRec(No *no, int temMin, int min, int temMax, int max) {
+  if (no == NULL)
+    return -1;
 
-    /* regra 1: ordenacao da arvore de busca */
-    if (temMin && no->chave <= min) return -2;
-    if (temMax && no->chave >= max) return -2;
+  /* regra 1: ordenacao da arvore de busca */
+  if (temMin && no->chave <= min)
+    return -2;
+  if (temMax && no->chave >= max)
+    return -2;
 
-    int he = validarRec(no->esq, temMin, min, 1, no->chave);
-    if (he == -2) return -2;
+  int he = validarRec(no->esq, temMin, min, 1, no->chave);
+  if (he == -2)
+    return -2;
 
-    int hd = validarRec(no->dir, 1, no->chave, temMax, max);
-    if (hd == -2) return -2;
+  int hd = validarRec(no->dir, 1, no->chave, temMax, max);
+  if (hd == -2)
+    return -2;
 
-    /* regra 2: o campo altura precisa estar correto */
-    if (no->altura != 1 + maximo(he, hd)) return -2;
+  /* regra 2: o campo altura precisa estar correto */
+  if (no->altura != 1 + maximo(he, hd))
+    return -2;
 
-    /* regra 3: o balanceamento nao pode passar de 1 */
-    int fb = he - hd;
-    if (fb < -1 || fb > 1) return -2;
+  /* regra 3: o balanceamento nao pode passar de 1 */
+  int fb = he - hd;
+  if (fb < -1 || fb > 1)
+    return -2;
 
-    return no->altura;
+  return no->altura;
 }
 
-int arvoreValida(No *raiz)
-{
-    return validarRec(raiz, 0, 0, 0, 0) != -2;
-}
+int arvoreValida(No *raiz) { return validarRec(raiz, 0, 0, 0, 0) != -2; }
 
 /* ############################################################################
  * ############################################################################
@@ -281,12 +277,12 @@ int arvoreValida(No *raiz)
  *
  *  Este e o percurso em POS-ORDEM: esquerda, direita, raiz.
  * ========================================================================== */
-void liberar(No *raiz)
-{
-    if (raiz == NULL) return;
-    liberar(raiz->esq);
-    liberar(raiz->dir);
-    free(raiz);
+void liberar(No *raiz) {
+  if (raiz == NULL)
+    return;
+  liberar(raiz->esq);
+  liberar(raiz->dir);
+  free(raiz);
 }
 
 /* ============================================================================
@@ -314,21 +310,19 @@ void liberar(No *raiz)
  *  Repare que a ordem das chaves nao muda: A < x < B < y < C antes e depois.
  *  A rotacao muda a FORMA da arvore, nunca a ORDEM.
  * ========================================================================== */
-No *rotacaoDireita(No *y)
-{
-    No *x = y->esq;
-    No *B = x->dir;
+No *rotacaoDireita(No *y) {
+  No *x = y->esq;
+  No *B = x->dir;
 
-    // rotacao
-    x->dir = y;
-    y->esq = B;
+  // rotacao
+  x->dir = y;
+  y->esq = B;
 
-    // atualizar
-    atualizarAltura(y);
-    atualizarAltura(x);
+  // atualizar
+  atualizarAltura(y);
+  atualizarAltura(x);
 
-
-    return x;
+  return x;
 }
 
 /* ============================================================================
@@ -352,21 +346,19 @@ No *rotacaoDireita(No *y)
  *
  *  DICA: pegue o seu TODO 2 e troque "esq" por "dir" em todo lugar.
  * ========================================================================== */
-No *rotacaoEsquerda(No *x)
-{
-    No *y = x->dir;
-    No *B = y->esq;
+No *rotacaoEsquerda(No *x) {
+  No *y = x->dir;
+  No *B = y->esq;
 
-    // rotacao
-    y->esq = x;
-    x->dir = B;
+  // rotacao
+  y->esq = x;
+  x->dir = B;
 
-    // atualizar
-    atualizarAltura(x);
-    atualizarAltura(y);
+  // atualizar
+  atualizarAltura(x);
+  atualizarAltura(y);
 
-
-    return y;        /* provisorio, para o programa compilar: troque pelo certo */
+  return y; /* provisorio, para o programa compilar: troque pelo certo */
 }
 
 /* ============================================================================
@@ -388,9 +380,8 @@ No *rotacaoEsquerda(No *x)
  *  Como ele acontece na VOLTA da recursao, o ajuste sobe da folha ate a raiz,
  *  corrigindo o primeiro no que ficou desequilibrado.
  * ========================================================================== */
-No *inserir(No *raiz, int chave)
-{
-    if(raiz == NULL)
+No *inserir(No *raiz, int chave) {
+  if (raiz == NULL)
     return criarNo(chave);
 
   if (chave < raiz->chave)
@@ -439,11 +430,30 @@ No *inserir(No *raiz, int chave)
  *  o rebalancear() precisa ser chamado na volta de TODOS os niveis - e nao
  *  so no primeiro no corrigido, como acontece na insercao.
  * ========================================================================== */
-No *remover(No *raiz, int chave)
-{
-    (void) chave;   /* apague esta linha quando implementar */
+No *remover(No *raiz, int chave) {
+  /* 1. Caso base: chave não encontrada */
+  if (raiz == NULL)
+    return NULL;
 
-    /* escreva sua implementacao aqui */
+  /* 2. Busca recursiva */
+  if (chave < raiz->chave) {
+    raiz->esq = remover(raiz->esq, chave);
+  } else if (chave > raiz->chave) {
+    raiz->dir = remover(raiz->dir, chave);
+  } else {
 
-    return raiz;    /* provisorio, para o programa compilar */
+    // /* 3. Encontrou o nó */  fira code
+    if (raiz->esq == NULL || raiz->dir == NULL) {
+      No *filho = (raiz->esq != NULL) ? raiz->esq : raiz->dir;
+      free(raiz);
+      return filho;
+    }
+
+    // dois filhos
+    No *sucessor = menorNo(raiz->dir);
+    raiz->chave = sucessor->chave;
+    raiz->dir = remover(raiz->dir, sucessor->chave);
+  }
+  return rebalancear(raiz);
 }
+//  40, 20, 60, 10, 30, 50, 70
